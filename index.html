@@ -2,148 +2,282 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para ti</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para ti mi amor</title>
     <style>
-        body { 
-            overflow: hidden; 
-            background: linear-gradient(to bottom, #74b9ff, #e0f6ff); 
+        * {
+            box-sizing: border-box;
         }
-        #canvas { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            z-index: 10; 
-            pointer-events: none; 
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+            font-family: 'Georgia', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            height: 100dvh;
         }
-        .sun { 
-            position: absolute; 
-            top: 10%; 
-            right: 15%; 
-            width: 90px; 
-            height: 90px; 
-            background: radial-gradient(circle, #fff700, #ffa502); 
-            border-radius: 50%; 
-            box-shadow: 0 0 60px 25px rgba(255, 165, 2, 0.5); 
-            z-index: 5; 
-            animation: pulse 4s infinite alternate;
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .sun {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 80px;
+            height: 80px;
+            background-color: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 40px #FFD700, 0 0 80px #FFA500;
+            z-index: 2;
+            animation: pulse 3s infinite alternate;
             display: none;
         }
-        @keyframes pulse { 
-            0% { transform: scale(1); box-shadow: 0 0 50px 20px rgba(255, 165, 2, 0.5); } 
-            100% { transform: scale(1.1); box-shadow: 0 0 80px 30px rgba(255, 165, 2, 0.7); } 
+        @keyframes pulse {
+            from { transform: scale(1); box-shadow: 0 0 40px #FFD700; }
+            to { transform: scale(1.1); box-shadow: 0 0 60px #FFA500; }
+        }
+
+        #envelopeContainer {
+            position: relative;
+            z-index: 20;
+            cursor: pointer;
+            transition: transform 0.3s;
+            transform: scale(0.9);
+        }
+        .envelope {
+            width: 300px;
+            height: 200px;
+            background-color: #d4a373;
+            position: relative;
+            border-radius: 5px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid #cc955b;
+            z-index: 22;
+            transition: transform 0.6s;
+            transform-origin: top;
+        }
+        .envelope-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-bottom: 100px solid #e0b485;
+            z-index: 21;
+        }
+        .instruccion {
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 25;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .seal {
+            position: absolute;
+            top: 85px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: #8b0000;
+            border-radius: 50%;
+            z-index: 26;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: gold;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #5a0000;
+            transition: opacity 0.3s;
         }
         
         .open-flap {
             transform: rotateX(180deg);
-            z-index: 20 !important;
+            z-index: 19;
         }
-        
-        .letter-container { 
-            position: absolute; 
-            z-index: 20; 
-            max-height: 85vh; 
-            overflow-y: auto; 
-            transition: opacity 0.8s ease, transform 0.8s ease; 
+        .break-seal {
             opacity: 0;
-            transform: scale(0.8) translateY(50px);
+        }
+        .hide-envelope {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            transition: opacity 0.5s 0.5s, transform 0.5s 0.5s;
+        }
+
+        #carta {
+            position: absolute;
+            z-index: 15;
+            background-color: #FFFDF0;
+            padding: 30px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 400px;
+            max-height: 85vh;
+            overflow-y: auto;
+            text-align: center;
+            color: #5C4033;
+            transition: opacity 0.8s 0.8s, transform 0.8s 0.8s;
+            opacity: 0;
+            transform: scale(0.5) translateY(100px);
             pointer-events: none;
         }
-        .visible-letter {
+        #carta.visible {
             opacity: 1;
             transform: scale(1) translateY(0);
             pointer-events: auto;
         }
-        .hidden-letter {
+        #carta.oculta {
             opacity: 0;
-            transform: translateY(20px) scale(0.9);
+            transform: scale(0.9);
             pointer-events: none;
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        h1 {
+            color: #DAA520;
+            font-style: italic;
+            font-size: 22px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        p {
+            line-height: 1.5;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+        .firma {
+            color: #DAA520;
+            font-style: italic;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #DAA520;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background 0.3s;
+            font-family: 'Georgia', serif;
+            width: 100%;
+            max-width: 250px;
+        }
+        button:hover {
+            background-color: #B8860B;
+        }
+        #btnVolver {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            display: none;
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen relative font-serif text-center p-4">
-    
+<body>
+
     <div class="sun" id="sol"></div>
     <canvas id="canvas"></canvas>
 
-    <div id="envelopeContainer" class="relative cursor-pointer transition-transform hover:scale-105 z-30" onclick="abrirSobre()">
-        <div class="w-80 h-56 bg-[#d4a373] relative rounded shadow-2xl">
-            <div id="flap" class="absolute top-0 left-0 w-0 h-0 border-l-[160px] border-r-[160px] border-t-[120px] border-l-transparent border-r-transparent border-t-[#cc955b] origin-top transition-transform duration-700 z-40"></div>
-            <div class="absolute bottom-0 left-0 w-0 h-0 border-l-[160px] border-r-[160px] border-b-[110px] border-l-transparent border-r-transparent border-b-[#e0b485] z-30"></div>
-            
-            <div id="instruccion" class="absolute top-[50px] left-0 w-full text-center z-50 text-white font-bold text-lg drop-shadow-md transition-opacity duration-500 pointer-events-none">Toca para leer carta</div>
-            
-            <div id="seal" class="absolute top-[90px] left-1/2 -translate-x-1/2 w-14 h-14 bg-red-800 rounded-full z-50 flex items-center justify-center text-yellow-500 text-2xl border-2 border-red-950 shadow-lg transition-opacity duration-500">❤</div>
+    <div id="envelopeContainer" onclick="abrirSobre()">
+        <div class="envelope">
+            <div class="flap" id="flap"></div>
+            <div class="envelope-bottom"></div>
+            <div class="instruccion" id="instruccion">Toca para leer carta</div>
+            <div class="seal" id="seal">❤</div>
         </div>
     </div>
 
-    <div id="carta" class="letter-container bg-[#22201d] text-gray-200 p-8 rounded-2xl shadow-2xl max-w-sm w-full border border-[#3e3b35]">
-        <h1 class="text-2xl text-[#d4af37] mb-6 italic">Con mucho amor te dedico esto porque eres especial para mí</h1>
-        <p class="mb-4">Mi murñeca hermosa,</p>
-        <p class="mb-4">Sé que estás pasando por un momento difícil, pero quiero recordarte lo increíble, valiente y fuerte que eres.</p>
-        <p class="mb-4">Estoy a tu lado, apoyándote en todo. No importa qué tan difícil parezca el panorama ahora, todo va a mejorar, y pasaremos por esto juntos.</p>
-        <p class="mb-6">Quiero verte sonreír de nuevo, y aunque las cosas tomen tiempo, aquí tienes este pequeño detalle para intentar alegrar un poco tu día.</p>
-        <p class="text-xl text-[#d4af37] italic mb-8">Te amo infinitamente mi negra hermosa ❤️</p>
+    <div id="carta">
+        <h1>Con mucho amor te dedico esto porque eres especial para mí</h1>
+        <p>Mi amor hermoso,</p>
+        <p>Sé que estás pasando por un momento difícil, pero quiero recordarte lo increíble, valiente y fuerte que eres.</p>
+        <p>Estoy a tu lado, apoyándote en todo. No importa qué tan difícil parezca el panorama ahora, todo va a mejorar, y pasaremos por esto juntos.</p>
+        <p>Quiero verte sonreír de nuevo, y aunque las cosas tomen tiempo, aquí tienes este pequeño detalle para intentar alegrar un poco tu día.</p>
+        <div class="firma">Te amo infinitamente mi negra hermosa ❤️</div>
         
-        <button onclick="ocultarCarta()" class="bg-[#d4af37] hover:bg-[#b5952f] text-black font-bold py-3 px-6 rounded-full transition duration-300 w-full shadow-lg">
-            Guardar carta
-        </button>
+        <button onclick="ocultarCarta()">Guardar carta</button>
     </div>
 
-    <button id="btnVolver" onclick="mostrarCarta()" class="hidden absolute bottom-8 z-30 bg-[#22201d] text-[#d4af37] font-bold py-3 px-6 rounded-full shadow-lg border border-[#d4af37] transition duration-300 hover:bg-[#3e3b35]">
-        Volver a leer carta
-    </button>
+    <button id="btnVolver" onclick="mostrarCarta()">Volver a leer carta</button>
 
     <script>
         let girasolesIniciados = false;
 
         function abrirSobre() {
             document.getElementById('flap').classList.add('open-flap');
-            document.getElementById('seal').style.opacity = '0';
+            document.getElementById('seal').classList.add('break-seal');
             document.getElementById('instruccion').style.opacity = '0';
+            document.getElementById('envelopeContainer').classList.add('hide-envelope');
             
-            setTimeout(() => {
-                document.getElementById('envelopeContainer').style.opacity = '0';
-                document.getElementById('envelopeContainer').style.pointerEvents = 'none';
-                
-                setTimeout(() => {
-                    document.getElementById('envelopeContainer').style.display = 'none';
-                    document.getElementById('carta').classList.add('visible-letter');
-                    document.getElementById('sol').style.display = 'block';
-                    
-                    if (!girasolesIniciados) {
-                        iniciarGirasoles();
-                        girasolesIniciados = true;
-                    }
-                }, 500);
-            }, 600);
+            const carta = document.getElementById('carta');
+            carta.classList.add('visible');
+
+            document.getElementById('sol').style.display = 'block';
+
+            if (!girasolesIniciados) {
+                iniciarGirasoles();
+                girasolesIniciados = true;
+            }
         }
 
         function ocultarCarta() {
-            const carta = document.getElementById('carta');
-            carta.classList.remove('visible-letter');
-            carta.classList.add('hidden-letter');
+            document.getElementById('carta').classList.add('oculta');
+            document.getElementById('carta').classList.remove('visible');
             setTimeout(() => {
-                document.getElementById('btnVolver').classList.remove('hidden');
-            }, 600);
+                document.getElementById('btnVolver').style.display = 'block';
+            }, 500);
         }
 
         function mostrarCarta() {
-            const carta = document.getElementById('carta');
-            document.getElementById('btnVolver').classList.add('hidden');
-            carta.classList.remove('hidden-letter');
-            carta.classList.add('visible-letter');
+            document.getElementById('btnVolver').style.display = 'none';
+            document.getElementById('carta').classList.remove('oculta');
+            document.getElementById('carta').classList.add('visible');
         }
 
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         
+        let isMobile = window.innerWidth < 600;
+        let scaleFactor = isMobile ? 0.5 : 1;
+        
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            isMobile = window.innerWidth < 600;
+            scaleFactor = isMobile ? 0.5 : 1;
         }
         window.addEventListener('resize', resize);
         resize();
@@ -151,59 +285,65 @@
         class Girasol {
             constructor() {
                 this.x = Math.random() * canvas.width;
-                this.y = canvas.height + 150;
-                this.targetY = canvas.height - (Math.random() * 250 + 100);
+                this.y = canvas.height + 100;
+                this.targetY = canvas.height - (Math.random() * (150 * scaleFactor) + (100 * scaleFactor));
                 this.size = 0;
-                this.maxSize = Math.random() * 20 + 25;
-                this.growthRate = Math.random() * 0.3 + 0.1;
+                this.maxSize = (Math.random() * 15 + 15) * scaleFactor;
+                this.growthRate = Math.random() * 0.2 + 0.1;
                 this.sway = Math.random() * Math.PI * 2;
                 this.swaySpeed = Math.random() * 0.02 + 0.01;
             }
 
             draw() {
-                const currentX = this.x + Math.sin(this.sway) * 20;
+                const currentX = this.x + Math.sin(this.sway) * (15 * scaleFactor);
                 
                 ctx.beginPath();
                 ctx.moveTo(this.x, canvas.height);
                 ctx.lineTo(currentX, this.y);
                 ctx.strokeStyle = '#228B22';
-                ctx.lineWidth = this.size * 0.25;
+                ctx.lineWidth = this.size * 0.3;
                 ctx.stroke();
 
                 if (this.size > this.maxSize * 0.5) {
                     ctx.fillStyle = '#228B22';
                     ctx.beginPath();
-                    ctx.ellipse(currentX - this.size * 0.9, this.y + this.size * 1.5, this.size * 0.7, this.size * 0.35, Math.PI / 4, 0, Math.PI * 2);
+                    ctx.ellipse(currentX - this.size, this.y + this.size * 2, this.size * 0.8, this.size * 0.4, Math.PI / 4, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.beginPath();
-                    ctx.ellipse(currentX + this.size * 0.9, this.y + this.size * 1.2, this.size * 0.7, this.size * 0.35, -Math.PI / 4, 0, Math.PI * 2);
+                    ctx.ellipse(currentX + this.size, this.y + this.size * 1.5, this.size * 0.8, this.size * 0.4, -Math.PI / 4, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
                 ctx.translate(currentX, this.y);
-                for (let i = 0; i < 16; i++) {
-                    ctx.rotate((Math.PI * 2) / 16);
+                for (let i = 0; i < 12; i++) {
+                    ctx.rotate((Math.PI * 2) / 12);
                     ctx.beginPath();
-                    ctx.ellipse(this.size * 1.2, 0, this.size * 1.6, this.size * 0.45, 0, 0, Math.PI * 2);
+                    ctx.ellipse(this.size * 1.5, 0, this.size * 2, this.size * 0.5, 0, 0, Math.PI * 2);
                     ctx.fillStyle = '#FFD700';
                     ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.ellipse(this.size * 1.5, 0, this.size * 2, this.size * 0.5, 0, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#DAA520';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
                 }
                 ctx.resetTransform();
 
                 ctx.beginPath();
-                ctx.arc(currentX, this.y, this.size * 0.85, 0, Math.PI * 2);
+                ctx.arc(currentX, this.y, this.size, 0, Math.PI * 2);
                 ctx.fillStyle = '#8B4513';
                 ctx.fill();
                 
                 ctx.beginPath();
-                ctx.arc(currentX, this.y, this.size * 0.65, 0, Math.PI * 2);
-                ctx.fillStyle = '#3e1f00';
+                ctx.arc(currentX, this.y, this.size * 0.7, 0, Math.PI * 2);
+                ctx.fillStyle = '#654321';
                 ctx.fill();
             }
 
             update() {
                 if (this.y > this.targetY) {
-                    this.y -= 2.5;
+                    this.y -= 2;
                 } else if (this.size < this.maxSize) {
                     this.size += this.growthRate;
                 }
@@ -213,12 +353,13 @@
         }
 
         let girasoles = [];
-
+        
         function iniciarGirasoles() {
-            for (let i = 0; i < 12; i++) {
+            let cantidadFlores = isMobile ? 12 : 20;
+            for (let i = 0; i < cantidadFlores; i++) {
                 setTimeout(() => {
                     girasoles.push(new Girasol());
-                }, i * 500);
+                }, i * 300);
             }
             animate();
         }
