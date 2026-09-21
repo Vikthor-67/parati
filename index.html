@@ -3,463 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para ti, mi amor 🌻</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <title>Para ti</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'sunflower': '#FFD700',
-                        'envelope-base': '#f3e5ab',
-                        'envelope-dark': '#e2d392',
-                        'paper': '#fdfbf7',
-                    },
-                    fontFamily: {
-                        'script': ['"Dancing Script"', 'cursive'],
-                        'serif': ['Lora', 'serif'],
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: linear-gradient(to bottom, #87CEEB, #e0f6ff);
+        body { 
+            overflow: hidden; 
+            background: linear-gradient(to bottom, #74b9ff, #e0f6ff); 
         }
-
-        #canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
+        #canvas { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: 10; 
+            pointer-events: none; 
         }
-
-        #ui-layer {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+        .sun { 
+            position: absolute; 
+            top: 10%; 
+            right: 15%; 
+            width: 90px; 
+            height: 90px; 
+            background: radial-gradient(circle, #fff700, #ffa502); 
+            border-radius: 50%; 
+            box-shadow: 0 0 60px 25px rgba(255, 165, 2, 0.5); 
+            z-index: 5; 
+            animation: pulse 4s infinite alternate;
+            display: none;
         }
-
-        /* Envelope Styles */
-        .envelope-wrapper {
-            position: relative;
-            width: 300px;
-            height: 200px;
-            cursor: pointer;
-            transition: transform 0.3s ease, opacity 1s ease;
+        @keyframes pulse { 
+            0% { transform: scale(1); box-shadow: 0 0 50px 20px rgba(255, 165, 2, 0.5); } 
+            100% { transform: scale(1.1); box-shadow: 0 0 80px 30px rgba(255, 165, 2, 0.7); } 
         }
-
-        .envelope-wrapper:hover {
-            transform: scale(1.05) translateY(-5px);
-        }
-
-        .envelope {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background-color: #e2d392;
-            border-radius: 0 0 10px 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 2;
-        }
-
-        .envelope::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 0;
-            border-left: 150px solid transparent;
-            border-right: 150px solid transparent;
-            border-bottom: 100px solid #d1c179;
-            z-index: 3;
-        }
-
-        .envelope::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 0;
-            border-left: 150px solid transparent;
-            border-right: 150px solid transparent;
-            border-top: 100px solid #f3e5ab;
-            z-index: 4;
-        }
-
-        .flap {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 0;
-            border-left: 150px solid transparent;
-            border-right: 150px solid transparent;
-            border-top: 120px solid #ebd78a;
-            transform-origin: top;
-            transition: transform 0.6s ease-in-out, z-index 0.2s;
-            z-index: 5;
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
-        }
-
-        .letter-preview {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
-            height: 180px;
-            background-color: #fdfbf7;
-            border-radius: 5px;
-            z-index: 1;
-            transition: transform 0.8s ease-in-out;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-            align-items: top;
-            padding-top: 20px;
-        }
-
-        /* Animation Classes */
-        .envelope-wrapper.open .flap {
+        
+        .open-flap {
             transform: rotateX(180deg);
-            z-index: 0;
+            z-index: 20 !important;
         }
-
-        .envelope-wrapper.open .letter-preview {
-            transform: translateY(-80px);
-            z-index: 4; /* Pushes letter above envelope front after opening */
-        }
-
-        .envelope-wrapper.fade-out {
+        
+        .letter-container { 
+            position: absolute; 
+            z-index: 20; 
+            max-height: 85vh; 
+            overflow-y: auto; 
+            transition: opacity 0.8s ease, transform 0.8s ease; 
             opacity: 0;
+            transform: scale(0.8) translateY(50px);
             pointer-events: none;
-            transform: translateY(50px) scale(0.9);
         }
-
-        /* Full Letter Styles */
-        #full-letter {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -40%);
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            background-color: #fdfbf7;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15), inset 0 0 20px rgba(230, 215, 180, 0.3);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 1.5s ease, transform 1.5s ease;
-            z-index: 20;
-            overflow-y: auto;
-            border: 1px solid #faedcd;
-        }
-
-        #full-letter.show {
+        .visible-letter {
             opacity: 1;
+            transform: scale(1) translateY(0);
             pointer-events: auto;
-            transform: translate(-50%, -50%);
         }
-
-        .heart {
-            color: #e63946;
-            animation: pulse 1.5s infinite;
-            display: inline-block;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        .instruction {
-            margin-top: 40px;
-            color: #4b5563;
-            font-size: 1.1rem;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        .hidden-letter {
+            opacity: 0;
+            transform: translateY(20px) scale(0.9);
+            pointer-events: none;
         }
     </style>
 </head>
-<body class="font-serif text-gray-800">
+<body class="flex items-center justify-center min-h-screen relative font-serif text-center p-4">
+    
+    <div class="sun" id="sol"></div>
+    <canvas id="canvas"></canvas>
 
-    <!-- Canvas for Sunflowers -->
-    <div id="canvas-container">
-        <canvas id="sunflower-canvas"></canvas>
-    </div>
-
-    <!-- UI Container -->
-    <div id="ui-layer">
-        
-        <!-- Interactive Envelope -->
-        <div class="envelope-wrapper" id="envelope">
-            <div class="flap"></div>
-            <div class="envelope"></div>
-            <div class="letter-preview">
-                <span class="font-script text-2xl text-gray-600">Para ti... ❤️</span>
-            </div>
-        </div>
-        
-        <p class="instruction font-script text-2xl" id="click-instruction">Toca el sobre para abrir</p>
-
-        <!-- The romantic letter -->
-        <div id="full-letter" class="text-center relative">
-            <!-- Decorative corners -->
-            <div class="absolute top-2 left-2 text-sunflower text-2xl opacity-50">🌻</div>
-            <div class="absolute top-2 right-2 text-sunflower text-2xl opacity-50">🌻</div>
-            <div class="absolute bottom-2 left-2 text-sunflower text-2xl opacity-50">🌻</div>
-            <div class="absolute bottom-2 right-2 text-sunflower text-2xl opacity-50">🌻</div>
-
-            <h1 class="font-script text-4xl md:text-5xl font-bold text-yellow-600 mb-6 mt-4">
-                Con mucho amor te dedico esto porque eres especial para mí
-            </h1>
+    <div id="envelopeContainer" class="relative cursor-pointer transition-transform hover:scale-105 z-30" onclick="abrirSobre()">
+        <div class="w-80 h-56 bg-[#d4a373] relative rounded shadow-2xl">
+            <div id="flap" class="absolute top-0 left-0 w-0 h-0 border-l-[160px] border-r-[160px] border-t-[120px] border-l-transparent border-r-transparent border-t-[#cc955b] origin-top transition-transform duration-700 z-40"></div>
+            <div class="absolute bottom-0 left-0 w-0 h-0 border-l-[160px] border-r-[160px] border-b-[110px] border-l-transparent border-r-transparent border-b-[#e0b485] z-30"></div>
             
-            <div class="space-y-4 text-lg md:text-xl leading-relaxed text-gray-700">
-                <p>Mi amor hermoso,</p>
-                
-                <p>Sé que estás pasando por un momento difícil, pero quiero recordarte lo increíble, valiente y fuerte que eres.</p>
-                
-                <p>Estoy a tu lado, apoyándote en todo. No importa qué tan difícil parezca el panorama ahora, todo va a mejorar, y pasaremos por esto juntos.</p>
-                
-                <p>Quiero verte sonreír de nuevo, y aunque las cosas tomen tiempo, aquí tienes este pequeño detalle para intentar alegrar un poco tu día.</p>
-                
-                <p class="font-bold text-yellow-700 mt-6">
-                    Te amo infinitamente mi negra hermosa <span class="heart">❤️</span>
-                </p>
-            </div>
+            <div id="instruccion" class="absolute top-[50px] left-0 w-full text-center z-50 text-white font-bold text-lg drop-shadow-md transition-opacity duration-500 pointer-events-none">Toca para leer carta</div>
+            
+            <div id="seal" class="absolute top-[90px] left-1/2 -translate-x-1/2 w-14 h-14 bg-red-800 rounded-full z-50 flex items-center justify-center text-yellow-500 text-2xl border-2 border-red-950 shadow-lg transition-opacity duration-500">❤</div>
         </div>
-
     </div>
+
+    <div id="carta" class="letter-container bg-[#22201d] text-gray-200 p-8 rounded-2xl shadow-2xl max-w-sm w-full border border-[#3e3b35]">
+        <h1 class="text-2xl text-[#d4af37] mb-6 italic">Con mucho amor te dedico esto porque eres especial para mí</h1>
+        <p class="mb-4">Mi murñeca hermosa,</p>
+        <p class="mb-4">Sé que estás pasando por un momento difícil, pero quiero recordarte lo increíble, valiente y fuerte que eres.</p>
+        <p class="mb-4">Estoy a tu lado, apoyándote en todo. No importa qué tan difícil parezca el panorama ahora, todo va a mejorar, y pasaremos por esto juntos.</p>
+        <p class="mb-6">Quiero verte sonreír de nuevo, y aunque las cosas tomen tiempo, aquí tienes este pequeño detalle para intentar alegrar un poco tu día.</p>
+        <p class="text-xl text-[#d4af37] italic mb-8">Te amo infinitamente mi negra hermosa ❤️</p>
+        
+        <button onclick="ocultarCarta()" class="bg-[#d4af37] hover:bg-[#b5952f] text-black font-bold py-3 px-6 rounded-full transition duration-300 w-full shadow-lg">
+            Guardar carta
+        </button>
+    </div>
+
+    <button id="btnVolver" onclick="mostrarCarta()" class="hidden absolute bottom-8 z-30 bg-[#22201d] text-[#d4af37] font-bold py-3 px-6 rounded-full shadow-lg border border-[#d4af37] transition duration-300 hover:bg-[#3e3b35]">
+        Volver a leer carta
+    </button>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const envelope = document.getElementById('envelope');
-            const fullLetter = document.getElementById('full-letter');
-            const clickInstruction = document.getElementById('click-instruction');
-            let isOpened = false;
+        let girasolesIniciados = false;
 
-            envelope.addEventListener('click', () => {
-                if (isOpened) return;
-                isOpened = true;
-
-                // Step 1: Open envelope flap and lift letter slightly
-                envelope.classList.add('open');
-                clickInstruction.style.opacity = '0';
-                clickInstruction.style.transition = 'opacity 0.5s';
-
-                // Step 2: Fade out envelope and show full letter, start animation
+        function abrirSobre() {
+            document.getElementById('flap').classList.add('open-flap');
+            document.getElementById('seal').style.opacity = '0';
+            document.getElementById('instruccion').style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('envelopeContainer').style.opacity = '0';
+                document.getElementById('envelopeContainer').style.pointerEvents = 'none';
+                
                 setTimeout(() => {
-                    envelope.classList.add('fade-out');
+                    document.getElementById('envelopeContainer').style.display = 'none';
+                    document.getElementById('carta').classList.add('visible-letter');
+                    document.getElementById('sol').style.display = 'block';
                     
-                    setTimeout(() => {
-                        fullLetter.classList.add('show');
-                        startSunflowerAnimation();
-                    }, 500);
+                    if (!girasolesIniciados) {
+                        iniciarGirasoles();
+                        girasolesIniciados = true;
+                    }
+                }, 500);
+            }, 600);
+        }
 
-                }, 1200);
-            });
+        function ocultarCarta() {
+            const carta = document.getElementById('carta');
+            carta.classList.remove('visible-letter');
+            carta.classList.add('hidden-letter');
+            setTimeout(() => {
+                document.getElementById('btnVolver').classList.remove('hidden');
+            }, 600);
+        }
 
-            const canvas = document.getElementById('sunflower-canvas');
-            const ctx = canvas.getContext('2d');
-            let width, height;
-            let sunflowers = [];
-            let animationId;
+        function mostrarCarta() {
+            const carta = document.getElementById('carta');
+            document.getElementById('btnVolver').classList.add('hidden');
+            carta.classList.remove('hidden-letter');
+            carta.classList.add('visible-letter');
+        }
 
-            // Resize canvas to fit screen
-            function resizeCanvas() {
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.width = width;
-                canvas.height = height;
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Girasol {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 150;
+                this.targetY = canvas.height - (Math.random() * 250 + 100);
+                this.size = 0;
+                this.maxSize = Math.random() * 20 + 25;
+                this.growthRate = Math.random() * 0.3 + 0.1;
+                this.sway = Math.random() * Math.PI * 2;
+                this.swaySpeed = Math.random() * 0.02 + 0.01;
             }
 
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
+            draw() {
+                const currentX = this.x + Math.sin(this.sway) * 20;
+                
+                ctx.beginPath();
+                ctx.moveTo(this.x, canvas.height);
+                ctx.lineTo(currentX, this.y);
+                ctx.strokeStyle = '#228B22';
+                ctx.lineWidth = this.size * 0.25;
+                ctx.stroke();
 
-            // Sunflower Class Definition
-            class Sunflower {
-                constructor(x) {
-                    this.x = x;
-                    this.y = height; // Starts at bottom
-                    // Random target height between 30% and 70% of screen height
-                    this.targetHeight = height * (0.3 + Math.random() * 0.4); 
-                    this.currentY = height;
-                    this.scale = 0.5 + Math.random() * 0.7; // Random size
-                    this.growthSpeed = 2 + Math.random() * 2;
-                    
-                    // State trackers
-                    this.stemGrown = false;
-                    this.flowerProgress = 0; // 0 to 1
-                    
-                    // Sway properties
-                    this.swayOffset = Math.random() * Math.PI * 2;
-                    this.swaySpeed = 0.02 + Math.random() * 0.02;
-                    
-                    // Leaf properties
-                    this.leftLeafY = height - (height - this.targetHeight) * 0.4;
-                    this.rightLeafY = height - (height - this.targetHeight) * 0.6;
-                    this.leafProgress = 0;
-                }
-
-                update() {
-                    if (!this.stemGrown) {
-                        this.currentY -= this.growthSpeed;
-                        if (this.currentY <= this.targetHeight) {
-                            this.currentY = this.targetHeight;
-                            this.stemGrown = true;
-                        }
-                    } else {
-                        if (this.flowerProgress < 1) {
-                            this.flowerProgress += 0.02; // Bloom speed
-                            this.leafProgress += 0.02;
-                        }
-                    }
-                    this.swayOffset += this.swaySpeed;
-                }
-
-                draw(ctx) {
-                    const sway = Math.sin(this.swayOffset) * 15 * this.scale;
-                    const flowerX = this.x + sway;
-                    const flowerY = this.currentY;
-
-                    // Draw Stem
+                if (this.size > this.maxSize * 0.5) {
+                    ctx.fillStyle = '#228B22';
                     ctx.beginPath();
-                    ctx.moveTo(this.x, height);
-                    ctx.quadraticCurveTo(this.x, (height + flowerY) / 2, flowerX, flowerY);
-                    ctx.lineWidth = 8 * this.scale;
-                    ctx.strokeStyle = '#228B22'; // Forest Green
-                    ctx.lineCap = 'round';
-                    ctx.stroke();
-
-                    // Draw Leaves if stem is grown enough
-                    if (this.stemGrown && this.leafProgress > 0) {
-                        ctx.fillStyle = '#228B22';
-                        
-                        // Left Leaf
-                        ctx.save();
-                        ctx.translate(this.x + (sway*0.4), this.leftLeafY);
-                        ctx.rotate(-Math.PI / 4 + Math.sin(this.swayOffset)*0.1);
-                        ctx.scale(this.leafProgress * this.scale, this.leafProgress * this.scale);
-                        ctx.beginPath();
-                        ctx.ellipse(-20, 0, 25, 10, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.restore();
-
-                        // Right Leaf
-                        ctx.save();
-                        ctx.translate(this.x + (sway*0.6), this.rightLeafY);
-                        ctx.rotate(Math.PI / 4 + Math.sin(this.swayOffset)*0.1);
-                        ctx.scale(this.leafProgress * this.scale, this.leafProgress * this.scale);
-                        ctx.beginPath();
-                        ctx.ellipse(20, 0, 25, 10, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.restore();
-                    }
-
-                    // Draw Flower Head
-                    if (this.stemGrown && this.flowerProgress > 0) {
-                        ctx.save();
-                        ctx.translate(flowerX, flowerY);
-                        ctx.scale(this.flowerProgress * this.scale, this.flowerProgress * this.scale);
-                        
-                        // Draw Petals
-                        ctx.fillStyle = '#FFD700'; // Sunflower Yellow
-                        const petalCount = 16;
-                        for (let i = 0; i < petalCount; i++) {
-                            ctx.save();
-                            ctx.rotate((Math.PI * 2 / petalCount) * i + this.swayOffset * 0.2);
-                            ctx.beginPath();
-                            // Petal shape
-                            ctx.ellipse(0, -30, 8, 35, 0, 0, Math.PI * 2);
-                            ctx.fill();
-                            // Add slight orange stroke to petals for depth
-                            ctx.strokeStyle = '#FFA500';
-                            ctx.lineWidth = 1;
-                            ctx.stroke();
-                            ctx.restore();
-                        }
-
-                        // Draw Center
-                        ctx.beginPath();
-                        ctx.arc(0, 0, 20, 0, Math.PI * 2);
-                        ctx.fillStyle = '#8B4513'; // Saddle Brown
-                        ctx.fill();
-                        
-                        // Center details (seeds)
-                        ctx.fillStyle = '#3e1f08';
-                        for(let i=0; i<30; i++) {
-                            let angle = Math.random() * Math.PI * 2;
-                            let rad = Math.random() * 15;
-                            ctx.beginPath();
-                            ctx.arc(Math.cos(angle)*rad, Math.sin(angle)*rad, 1.5, 0, Math.PI*2);
-                            ctx.fill();
-                        }
-
-                        ctx.restore();
-                    }
+                    ctx.ellipse(currentX - this.size * 0.9, this.y + this.size * 1.5, this.size * 0.7, this.size * 0.35, Math.PI / 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.ellipse(currentX + this.size * 0.9, this.y + this.size * 1.2, this.size * 0.7, this.size * 0.35, -Math.PI / 4, 0, Math.PI * 2);
+                    ctx.fill();
                 }
-            }
 
-            function createField() {
-                // Number of sunflowers depends on screen width
-                const numFlowers = Math.floor(width / 60); 
-                for (let i = 0; i < numFlowers; i++) {
-                    // Distribute across screen width with some randomness
-                    const x = (width / numFlowers) * i + (Math.random() * 40 - 20);
-                    // Add delay by staggering their creation or just let them grow at random speeds
-                    setTimeout(() => {
-                        sunflowers.push(new Sunflower(x));
-                    }, Math.random() * 2000); // Random start delay up to 2 seconds
+                ctx.translate(currentX, this.y);
+                for (let i = 0; i < 16; i++) {
+                    ctx.rotate((Math.PI * 2) / 16);
+                    ctx.beginPath();
+                    ctx.ellipse(this.size * 1.2, 0, this.size * 1.6, this.size * 0.45, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = '#FFD700';
+                    ctx.fill();
                 }
+                ctx.resetTransform();
+
+                ctx.beginPath();
+                ctx.arc(currentX, this.y, this.size * 0.85, 0, Math.PI * 2);
+                ctx.fillStyle = '#8B4513';
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(currentX, this.y, this.size * 0.65, 0, Math.PI * 2);
+                ctx.fillStyle = '#3e1f00';
+                ctx.fill();
             }
 
-            function animate() {
-                // Clear canvas with a slight transparent background to create a very subtle trail (optional)
-                ctx.clearRect(0, 0, width, height);
-
-                // Sort sunflowers by scale so smaller ones are drawn first (background)
-                sunflowers.sort((a, b) => a.scale - b.scale);
-
-                sunflowers.forEach(flower => {
-                    flower.update();
-                    flower.draw(ctx);
-                });
-
-                animationId = requestAnimationFrame(animate);
+            update() {
+                if (this.y > this.targetY) {
+                    this.y -= 2.5;
+                } else if (this.size < this.maxSize) {
+                    this.size += this.growthRate;
+                }
+                this.sway += this.swaySpeed;
+                this.draw();
             }
+        }
 
-            function startSunflowerAnimation() {
-                createField();
-                animate();
+        let girasoles = [];
+
+        function iniciarGirasoles() {
+            for (let i = 0; i < 12; i++) {
+                setTimeout(() => {
+                    girasoles.push(new Girasol());
+                }, i * 500);
             }
-        });
+            animate();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            girasoles.forEach(flor => flor.update());
+            requestAnimationFrame(animate);
+        }
     </script>
 </body>
 </html>
